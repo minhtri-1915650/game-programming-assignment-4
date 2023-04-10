@@ -320,7 +320,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce88fcafbd2eff146af40aed258759fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chesspiece: {fileID: 0}
+  chesspiece: {fileID: 8772043852586712725, guid: 6c8ce992a00caa440a77dd9b8cb787e0, type: 3}
 --- !u!4 &1054705960
 Transform:
   m_ObjectHideFlags: 0
