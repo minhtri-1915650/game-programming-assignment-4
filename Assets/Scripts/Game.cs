@@ -21,18 +21,28 @@ public class Game : MonoBehaviour
             Create("red_chess", 0, 0), Create("red_chess", 2, 0), Create("red_chess", 4, 0), Create("red_chess", 6, 0),
             Create("red_chess", 1, 1), Create("red_chess", 3, 1), Create("red_chess", 5, 1), Create("red_chess", 7, 1),
             Create("red_chess", 0, 2), Create("red_chess", 2, 2), Create("red_chess", 4, 2), Create("red_chess", 6, 2)};
-
-        playerBlack = new GameObject[] {
-            Create("black_chess", 1, 5), Create("black_chess", 3, 5), Create("black_chess", 5, 5), Create("black_chess", 7, 5),
-            Create("black_chess", 0, 6), Create("black_chess", 2, 6), Create("black_chess", 4, 6), Create("black_chess", 6, 6),
+        // playerRed = new GameObject[] { 
+        //     Create("red_chess", 0, 0)};
+        
+        // playerBlack = new GameObject[] { 
+        //     Create("black_chess", 1, 1), Create("black_chess", 3, 3),Create("black_chess", 3, 5),Create("black_chess", 5, 5),Create("black_chess", 2, 6)};
+        playerBlack = new GameObject[] { 
+            Create("black_chess", 1, 5), Create("black_chess", 3, 5), Create("black_chess", 5, 5), Create("black_chess", 7, 5), 
+            Create("black_chess", 0, 6), Create("black_chess", 2, 6), Create("black_chess", 4, 6), Create("black_chess", 6, 6), 
             Create("black_chess", 1, 7), Create("black_chess", 3, 7), Create("black_chess", 5, 7), Create("black_chess", 7, 7)};
 
         for (int i = 0; i < playerBlack.Length; i++)
         {
             SetPosition(playerBlack[i]);
+        }
+        for (int i = 0; i < playerRed.Length; i++)
+        {
             SetPosition(playerRed[i]);
         }
+        DrawMovingPlate();
     }
+
+    
 
     public GameObject Create(string name, int x, int y)
     {
@@ -87,6 +97,34 @@ public class Game : MonoBehaviour
         {
             currentPlayer = "red";
         }
+    }
+
+    public void DrawMovingPlate() {
+        // printPlayer();
+    
+        GameObject[] player = (currentPlayer == "red") ? playerRed : playerBlack;
+        foreach (var chess in player)
+        {
+            if (chess != null) {
+                Chessman cm = chess.GetComponent<Chessman>();
+                if (GetPosition(cm.GetXBoard(),cm.GetYBoard()) != null) 
+                    cm.DrawWaitingPlate();            
+
+            }
+        }
+        
+    }
+
+    public void printPlayer() {
+        string log = "";
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (positions[j, 7-i] == null) log = log + " null";
+                else log = log + " " + positions[j,7-i].GetComponent<Chessman>().getPlayer();
+            }
+            log = log + "\n";
+        }
+        Debug.Log(log);
     }
 
     public void Update()

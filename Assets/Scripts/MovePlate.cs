@@ -11,21 +11,35 @@ public class MovePlate : MonoBehaviour
     int matrixX;
     int matrixY;
 
-    public bool attack = false;
+    public string color;
 
     public void Start()
     {
-        if (attack)
-        {
-            gameObject.GetComponent<SpriteRenderer>().color = new Color(1.0f, 0.0f, 0.0f, 1.0f);
-        }
+        switch (color)
+       {
+        case "red":
+            gameObject.GetComponent<SpriteRenderer>().color = new Color(1,0,0,0.7f);
+            break;
+        case "yellow":
+            gameObject.GetComponent<SpriteRenderer>().color = new Color(1,1,0,0.7f);
+            break;
+        case "green":
+            gameObject.GetComponent<SpriteRenderer>().color = new Color(0,1,0,0.7f);
+            break;
+       } 
     }
 
     public void OnMouseUp()
     {
         controller = GameObject.FindGameObjectWithTag("GameController");
         Chessman cm = reference.GetComponent<Chessman>();
-        if (attack)
+        // cm.DestroyMovePlates();
+        if (color == "yellow") {
+            // controller.GetComponent<Game>().DrawMovingPlate();
+            // cm.InitiateMovePlates();
+            return;
+        }
+        if (color == "red")
         {
             GameObject cp = controller.GetComponent<Game>().GetPosition(
                 (matrixX+cm.GetXBoard())/2, 
@@ -33,11 +47,14 @@ public class MovePlate : MonoBehaviour
 
             // if (cp.name == "white_king") controller.GetComponent<Game>().Winner("black");
             // if (cp.name == "black_king") controller.GetComponent<Game>().Winner("red");
-
+            controller.GetComponent<Game>().SetPositionEmpty(
+                (matrixX+cm.GetXBoard())/2, 
+                (matrixY+cm.GetYBoard())/2);
             Destroy(cp);
         }
-
-        controller.GetComponent<Game>().SetPositionEmpty(cm.GetXBoard(), 
+    
+        controller.GetComponent<Game>().SetPositionEmpty(
+            cm.GetXBoard(), 
             cm.GetYBoard());
 
         cm.SetXBoard(matrixX);
@@ -54,11 +71,13 @@ public class MovePlate : MonoBehaviour
             cm.name = "black_king_chess";
             cm.Activate();
         }
-
-        controller.GetComponent<Game>().NextTurn();
         controller.GetComponent<Game>().SetPosition(reference);
+        if (color != "red" || cm.RecursionPlay() == 1) {
+            controller.GetComponent<Game>().NextTurn();
 
-        cm.DestroyMovePlates();
+            cm.DestroyMovePlates();
+            controller.GetComponent<Game>().DrawMovingPlate();
+        }
     }
 
     public void SetCoords(int x, int y)
