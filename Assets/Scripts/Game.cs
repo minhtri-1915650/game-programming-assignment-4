@@ -11,6 +11,8 @@ public class Game : MonoBehaviour
     private GameObject[,] positions = new GameObject[8, 8];
     private GameObject[] playerBlack = new GameObject[12];
     private GameObject[] playerRed = new GameObject[12];
+    private int countBlack;
+    private int countRed;
 
     private string currentPlayer = "red";
     private bool gameOver = false;
@@ -21,16 +23,16 @@ public class Game : MonoBehaviour
             Create("red_chess", 0, 0), Create("red_chess", 2, 0), Create("red_chess", 4, 0), Create("red_chess", 6, 0), 
             Create("red_chess", 1, 1), Create("red_chess", 3, 1), Create("red_chess", 5, 1), Create("red_chess", 7, 1), 
             Create("red_chess", 0, 2), Create("red_chess", 2, 2), Create("red_chess", 4, 2), Create("red_chess", 6, 2)};
-        // playerRed = new GameObject[] { 
-        //     Create("red_chess", 0, 0)};
-        
-        // playerBlack = new GameObject[] { 
-        //     Create("black_chess", 1, 1), Create("black_chess", 3, 3),Create("black_chess", 3, 5),Create("black_chess", 5, 5),Create("black_chess", 2, 6)};
         playerBlack = new GameObject[] { 
             Create("black_chess", 1, 5), Create("black_chess", 3, 5), Create("black_chess", 5, 5), Create("black_chess", 7, 5), 
             Create("black_chess", 0, 6), Create("black_chess", 2, 6), Create("black_chess", 4, 6), Create("black_chess", 6, 6), 
             Create("black_chess", 1, 7), Create("black_chess", 3, 7), Create("black_chess", 5, 7), Create("black_chess", 7, 7)};
 
+        // playerRed = new GameObject[] { 
+        //     Create("red_chess", 0, 0)};
+        
+        // playerBlack = new GameObject[] { 
+        //     Create("black_chess", 1, 1)};
         for (int i = 0; i < playerBlack.Length; i++)
         {
             SetPosition(playerBlack[i]);
@@ -39,7 +41,16 @@ public class Game : MonoBehaviour
         {
             SetPosition(playerRed[i]);
         }
+        countBlack = playerBlack.Length;
+        countRed = playerRed.Length;
         DrawMovingPlate();
+    }
+
+    public void decreaseBlack() {
+        countBlack -= 1;
+    }
+    public void decreaseRed() {
+        countRed -= 1;
     }
 
     
@@ -136,14 +147,19 @@ public class Game : MonoBehaviour
         }
     }
     
-    // public void Winner(string playerWinner)
-    // {
-    //     gameOver = true;
+    public void CheckWinner()
+    {
+        if (countBlack == 0 || countRed == 0) {
+            gameOver = true;
 
-    //     //Using UnityEngine.UI is needed here
-    //     GameObject.FindGameObjectWithTag("WinnerText").GetComponent<Text>().enabled = true;
-    //     GameObject.FindGameObjectWithTag("WinnerText").GetComponent<Text>().text = playerWinner + " is the winner";
+            string winner = (countBlack == 0) ? "Red" : "Black";
 
-    //     GameObject.FindGameObjectWithTag("RestartText").GetComponent<Text>().enabled = true;
-    // }
+            //Using UnityEngine.UI is needed here
+            GameObject.FindGameObjectWithTag("WinnerText").GetComponent<Text>().enabled = true;
+            GameObject.FindGameObjectWithTag("WinnerText").GetComponent<Text>().text = winner + " is the winner";
+
+            GameObject.FindGameObjectWithTag("RestartText").GetComponent<Text>().enabled = true;
+
+        } 
+    }
 }

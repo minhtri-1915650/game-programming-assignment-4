@@ -51,6 +51,8 @@ public class MovePlate : MonoBehaviour
                 (matrixX+cm.GetXBoard())/2, 
                 (matrixY+cm.GetYBoard())/2);
             Destroy(cp);
+            if (cm.getPlayer() == "red") controller.GetComponent<Game>().decreaseBlack();
+            else controller.GetComponent<Game>().decreaseRed();
         }
     
         controller.GetComponent<Game>().SetPositionEmpty(
@@ -74,10 +76,10 @@ public class MovePlate : MonoBehaviour
         controller.GetComponent<Game>().SetPosition(reference);
         if (color != "red" || cm.RecursionPlay() == 1) {
             controller.GetComponent<Game>().NextTurn();
-
             cm.DestroyMovePlates();
             controller.GetComponent<Game>().DrawMovingPlate();
         }
+        controller.GetComponent<Game>().CheckWinner();
     }
 
     public void SetCoords(int x, int y)
