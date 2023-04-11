@@ -25,7 +25,7 @@ public class Game : MonoBehaviour
         //     Create("red_chess", 0, 0)};
         
         // playerBlack = new GameObject[] { 
-        //     Create("black_chess", 1, 1), Create("black_chess", 3, 3),Create("black_chess", 3, 5),Create("black_chess", 5, 5)};
+        //     Create("black_chess", 1, 1), Create("black_chess", 3, 3),Create("black_chess", 3, 5),Create("black_chess", 5, 5),Create("black_chess", 2, 6)};
         playerBlack = new GameObject[] { 
             Create("black_chess", 1, 5), Create("black_chess", 3, 5), Create("black_chess", 5, 5), Create("black_chess", 7, 5), 
             Create("black_chess", 0, 6), Create("black_chess", 2, 6), Create("black_chess", 4, 6), Create("black_chess", 6, 6), 

@@ -170,32 +170,29 @@ public class Chessman : MonoBehaviour
     public int RecursionPlay() {
         Game sc = controller.GetComponent<Game>();
         bool isMove = false;
-        List<(int x, int y)> moves = new List<(int x, int y)>();
+        List<(int x, int y)> moveSteps = new List<(int x, int y)>();
         int xdis = 0,ydis = 0;
         foreach (var move in getMovePoints()) {
             int x = GetXBoard() + move.x;
             int y = GetYBoard() + move.y;
             if (sc.PositionOnBoard(x, y)){
                 GameObject cp = sc.GetPosition(x, y);
-
-                if (cp == null) {
-                    continue;
-                }
-                else if (cp.GetComponent<Chessman>().player != player)
+                if (cp != null && cp.GetComponent<Chessman>().player != player)
                 {
                     if (sc.PositionOnBoard(x+move.x, y+move.y) && 
-                        sc.GetPosition(x+move.x, y+move.y) == null)
+                        sc.GetPosition(x+move.x, y+move.y) == null) {
                         isMove = true;
                         xdis = x+move.x;
                         ydis = y+move.y;
-                        moves.Add((x+move.x, y+move.y));
+                        moveSteps.Add((x+move.x, y+move.y));
+                    }
                 }
             }
         }
         if (isMove) {
-            if (moves.Count > 1) {
+            if (moveSteps.Count > 1) {
                 DestroyMovePlates();
-                foreach(var move in moves) {
+                foreach(var move in moveSteps) {
                     MovePlateSpawn(move.x, move.y, "red");
                     // controller.GetComponent<Game>().NextTurn();
                 }
