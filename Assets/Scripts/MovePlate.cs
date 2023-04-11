@@ -36,7 +36,6 @@ public class MovePlate : MonoBehaviour
 
             Destroy(cp);
         }
-        else controller.GetComponent<Game>().NextTurn();
 
         controller.GetComponent<Game>().SetPositionEmpty(cm.GetXBoard(), 
             cm.GetYBoard());
@@ -56,6 +55,7 @@ public class MovePlate : MonoBehaviour
             cm.Activate();
         }
 
+        controller.GetComponent<Game>().NextTurn();
         controller.GetComponent<Game>().SetPosition(reference);
 
         cm.DestroyMovePlates();
