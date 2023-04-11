@@ -23,21 +23,21 @@ public class Chessman : MonoBehaviour
 
         switch (this.name)
         {
-            case "black_chess": 
-                this.GetComponent<SpriteRenderer>().sprite = black_chess; 
-                player = "black"; 
+            case "black_chess":
+                this.GetComponent<SpriteRenderer>().sprite = black_chess;
+                player = "black";
                 break;
-            case "black_king_chess": 
-                this.GetComponent<SpriteRenderer>().sprite = black_king_chess; 
-                player = "black"; 
+            case "black_king_chess":
+                this.GetComponent<SpriteRenderer>().sprite = black_king_chess;
+                player = "black";
                 break;
-            case "red_chess": 
-                this.GetComponent<SpriteRenderer>().sprite = red_chess; 
-                player = "red"; 
+            case "red_chess":
+                this.GetComponent<SpriteRenderer>().sprite = red_chess;
+                player = "red";
                 break;
-            case "red_king_chess": 
-                this.GetComponent<SpriteRenderer>().sprite = red_king_chess; 
-                player = "red"; 
+            case "red_king_chess":
+                this.GetComponent<SpriteRenderer>().sprite = red_king_chess;
+                player = "red";
                 break;
         }
     }
@@ -99,19 +99,19 @@ public class Chessman : MonoBehaviour
         switch (this.name)
         {
             case "red_chess":
-                PointMovePlate(1,1);
-                PointMovePlate(-1,1);
+                PointMovePlate(1, 1);
+                PointMovePlate(-1, 1);
                 break;
             case "black_chess":
-                PointMovePlate(1,-1);
-                PointMovePlate(-1,-1);
+                PointMovePlate(1, -1);
+                PointMovePlate(-1, -1);
                 break;
             case "red_king_chess":
             case "black_king_chess":
-                PointMovePlate(1,1);
-                PointMovePlate(-1,1);
-                PointMovePlate(1,-1);
-                PointMovePlate(-1,-1);
+                PointMovePlate(1, 1);
+                PointMovePlate(-1, 1);
+                PointMovePlate(1, -1);
+                PointMovePlate(-1, -1);
                 break;
         }
     }
@@ -131,9 +131,9 @@ public class Chessman : MonoBehaviour
             }
             else if (cp.GetComponent<Chessman>().player != player)
             {
-                if (sc.PositionOnBoard(x+xIncrement, y+yIncrement) && 
-                    sc.GetPosition(x+xIncrement, y+yIncrement) == null)
-                MovePlateSpawn(x+xIncrement, y+yIncrement, true);
+                if (sc.PositionOnBoard(x + xIncrement, y + yIncrement) &&
+                    sc.GetPosition(x + xIncrement, y + yIncrement) == null)
+                    MovePlateSpawn(x + xIncrement, y + yIncrement, true);
             }
         }
     }
@@ -157,7 +157,8 @@ public class Chessman : MonoBehaviour
         mpScript.SetCoords(matrixX, matrixY);
     }
 
-    public string GetPlayer() {
+    public string GetPlayer()
+    {
         return player;
     }
 }

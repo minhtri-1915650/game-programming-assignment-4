@@ -17,14 +17,14 @@ public class Game : MonoBehaviour
 
     public void Start()
     {
-        playerRed = new GameObject[] { 
-            Create("red_chess", 0, 0), Create("red_chess", 2, 0), Create("red_chess", 4, 0), Create("red_chess", 6, 0), 
-            Create("red_chess", 1, 1), Create("red_chess", 3, 1), Create("red_chess", 5, 1), Create("red_chess", 7, 1), 
+        playerRed = new GameObject[] {
+            Create("red_chess", 0, 0), Create("red_chess", 2, 0), Create("red_chess", 4, 0), Create("red_chess", 6, 0),
+            Create("red_chess", 1, 1), Create("red_chess", 3, 1), Create("red_chess", 5, 1), Create("red_chess", 7, 1),
             Create("red_chess", 0, 2), Create("red_chess", 2, 2), Create("red_chess", 4, 2), Create("red_chess", 6, 2)};
-        
-        playerBlack = new GameObject[] { 
-            Create("black_chess", 1, 5), Create("black_chess", 3, 5), Create("black_chess", 5, 5), Create("black_chess", 7, 5), 
-            Create("black_chess", 0, 6), Create("black_chess", 2, 6), Create("black_chess", 4, 6), Create("black_chess", 6, 6), 
+
+        playerBlack = new GameObject[] {
+            Create("black_chess", 1, 5), Create("black_chess", 3, 5), Create("black_chess", 5, 5), Create("black_chess", 7, 5),
+            Create("black_chess", 0, 6), Create("black_chess", 2, 6), Create("black_chess", 4, 6), Create("black_chess", 6, 6),
             Create("black_chess", 1, 7), Create("black_chess", 3, 7), Create("black_chess", 5, 7), Create("black_chess", 7, 7)};
 
         for (int i = 0; i < playerBlack.Length; i++)
@@ -37,11 +37,11 @@ public class Game : MonoBehaviour
     public GameObject Create(string name, int x, int y)
     {
         GameObject obj = Instantiate(chesspiece, new Vector3(0, 0, -1), Quaternion.identity);
-        Chessman cm = obj.GetComponent<Chessman>(); 
-        cm.name = name; 
+        Chessman cm = obj.GetComponent<Chessman>();
+        cm.name = name;
         cm.SetXBoard(x);
         cm.SetYBoard(y);
-        cm.Activate(); 
+        cm.Activate();
         return obj;
     }
 
@@ -94,10 +94,10 @@ public class Game : MonoBehaviour
         if (gameOver == true && Input.GetMouseButtonDown(0))
         {
             gameOver = false;
-            SceneManager.LoadScene("Game"); 
+            SceneManager.LoadScene("Game");
         }
     }
-    
+
     // public void Winner(string playerWinner)
     // {
     //     gameOver = true;
