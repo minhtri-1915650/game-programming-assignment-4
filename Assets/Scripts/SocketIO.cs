@@ -82,6 +82,10 @@ public class SocketIO : MonoBehaviour
         {
             string name = res.GetValue<string>();
             this.name = name;
+            if (name == "red")
+            {
+                controller.DrawMovingPlate();
+            }
             Debug.Log("name: " + name);
         });
 

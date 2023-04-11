@@ -227,6 +227,8 @@ public class Chessman : MonoBehaviour
                 (xdis + GetXBoard()) / 2,
                 (ydis + GetYBoard()) / 2);
             Destroy(cp);
+            if (player == "red") controller.GetComponent<Game>().decreaseBlack();
+            else controller.GetComponent<Game>().decreaseRed();
 
             controller.GetComponent<Game>().SetPositionEmpty(
                 GetXBoard(),
