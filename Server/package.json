@@ -4,10 +4,11 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-      "start": "node index.js"
+        "start": "node index.js"
     },
     "author": "",
     "dependencies": {
-      "socket.io": "^4.2.0"
+        "nodemon": "^2.0.22",
+        "socket.io": "^4.2.0"
     }
-  }
+}

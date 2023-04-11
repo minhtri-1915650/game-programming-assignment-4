@@ -4,9 +4,11 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+
 public class Game : MonoBehaviour
 {
     public GameObject chesspiece;
+    public GameObject network;
 
     private GameObject[,] positions = new GameObject[8, 8];
     private GameObject[] playerBlack = new GameObject[12];
@@ -17,18 +19,20 @@ public class Game : MonoBehaviour
 
     public void Start()
     {
+        this.network = GameObject.FindGameObjectWithTag("Network");
+
         playerRed = new GameObject[] {
             Create("red_chess", 0, 0), Create("red_chess", 2, 0), Create("red_chess", 4, 0), Create("red_chess", 6, 0),
             Create("red_chess", 1, 1), Create("red_chess", 3, 1), Create("red_chess", 5, 1), Create("red_chess", 7, 1),
             Create("red_chess", 0, 2), Create("red_chess", 2, 2), Create("red_chess", 4, 2), Create("red_chess", 6, 2)};
         // playerRed = new GameObject[] { 
         //     Create("red_chess", 0, 0)};
-        
+
         // playerBlack = new GameObject[] { 
         //     Create("black_chess", 1, 1), Create("black_chess", 3, 3),Create("black_chess", 3, 5),Create("black_chess", 5, 5),Create("black_chess", 2, 6)};
-        playerBlack = new GameObject[] { 
-            Create("black_chess", 1, 5), Create("black_chess", 3, 5), Create("black_chess", 5, 5), Create("black_chess", 7, 5), 
-            Create("black_chess", 0, 6), Create("black_chess", 2, 6), Create("black_chess", 4, 6), Create("black_chess", 6, 6), 
+        playerBlack = new GameObject[] {
+            Create("black_chess", 1, 5), Create("black_chess", 3, 5), Create("black_chess", 5, 5), Create("black_chess", 7, 5),
+            Create("black_chess", 0, 6), Create("black_chess", 2, 6), Create("black_chess", 4, 6), Create("black_chess", 6, 6),
             Create("black_chess", 1, 7), Create("black_chess", 3, 7), Create("black_chess", 5, 7), Create("black_chess", 7, 7)};
 
         for (int i = 0; i < playerBlack.Length; i++)
@@ -39,10 +43,9 @@ public class Game : MonoBehaviour
         {
             SetPosition(playerRed[i]);
         }
-        DrawMovingPlate();
     }
 
-    
+
 
     public GameObject Create(string name, int x, int y)
     {
@@ -82,6 +85,12 @@ public class Game : MonoBehaviour
         return currentPlayer;
     }
 
+    public void SetCurrentPlayer(string player)
+    {
+        currentPlayer = player;
+        this.DrawMovingPlate();
+    }
+
     public bool IsGameOver()
     {
         return gameOver;
@@ -97,30 +106,37 @@ public class Game : MonoBehaviour
         {
             currentPlayer = "red";
         }
+
+        network.GetComponent<SocketIO>().NextTurn(currentPlayer);
     }
 
-    public void DrawMovingPlate() {
-        // printPlayer();
-    
+    public void DrawMovingPlate()
+    {
+        printPlayer();
+
         GameObject[] player = (currentPlayer == "red") ? playerRed : playerBlack;
         foreach (var chess in player)
         {
-            if (chess != null) {
+            if (chess != null)
+            {
                 Chessman cm = chess.GetComponent<Chessman>();
-                if (GetPosition(cm.GetXBoard(),cm.GetYBoard()) != null) 
-                    cm.DrawWaitingPlate();            
+                if (GetPosition(cm.GetXBoard(), cm.GetYBoard()) != null)
+                    cm.DrawWaitingPlate();
 
             }
         }
-        
+
     }
 
-    public void printPlayer() {
+    public void printPlayer()
+    {
         string log = "";
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                if (positions[j, 7-i] == null) log = log + " null";
-                else log = log + " " + positions[j,7-i].GetComponent<Chessman>().getPlayer();
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if (positions[j, 7 - i] == null) log = log + " null";
+                else log = log + " " + positions[j, 7 - i].GetComponent<Chessman>().getPlayer();
             }
             log = log + "\n";
         }
