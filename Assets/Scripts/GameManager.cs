@@ -19,6 +19,14 @@ public class GameManager : MonoBehaviour
 
     public void chooseStateVSMachine() {
         AIMode.aimode = true;
+        AIMode.easyLevel = false;
+        changeScence();
+    }
+
+    public void chooseStateVSMachineEasy()
+    {
+        AIMode.aimode = true;
+        AIMode.easyLevel = true;
         changeScence();
     }
 

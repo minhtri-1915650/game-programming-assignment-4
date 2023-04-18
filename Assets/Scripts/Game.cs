@@ -93,7 +93,7 @@ public class Game : MonoBehaviour
             {
                 if (positions[i, j] == null)
                 {
-                    state[i, j] = 0;
+                    state[j, i] = 0;
                 }
                 else
                 {
@@ -101,16 +101,16 @@ public class Game : MonoBehaviour
                     switch (obj.name)
                     {
                         case "black_chess":
-                            state[i, j] = -1;
+                            state[j, i] = -1;
                             break;
                         case "black_king_chess":
-                            state[i, j] = -2;
+                            state[j, i] = -2;
                             break;
                         case "red_chess":
-                            state[i, j] = 1;
+                            state[j, i] = 1;
                             break;
                         case "red_king_chess":
-                            state[i, j] = 2;
+                            state[j, i] = 2;
                             break;
                     }
                 }
@@ -212,39 +212,61 @@ public class Game : MonoBehaviour
 
     public void Update()
     {
-        if (currentPlayer == "black")
+        if (currentPlayer == "black" && AIMode.aimode)
         {
             MovementInfo mv = new MovementInfo(GetStateBoard());
             HttpClient _httpClient = new HttpClient();
-            var request = new HttpRequestMessage
+            HttpRequestMessage request;
+            if (AIMode.easyLevel)
             {
-                Method = HttpMethod.Put,
-                RequestUri = new Uri("http://localhost:5000/mcts-move"),
-                Content = new StringContent(JsonConvert.SerializeObject(mv), Encoding.UTF8, MediaTypeNames.Application.Json)
-            };
+                request = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Put,
+                    RequestUri = new Uri("http://localhost:5000/checker-agent/random-move"),
+                    Content = new StringContent(JsonConvert.SerializeObject(mv), Encoding.UTF8, MediaTypeNames.Application.Json)
+                };
+            }
+            else
+            {
+                request = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Put,
+                    RequestUri = new Uri("http://localhost:5000/checker-agent/mcts-move"),
+                    Content = new StringContent(JsonConvert.SerializeObject(mv), Encoding.UTF8, MediaTypeNames.Application.Json)
+                };
+
+            }
             var response = _httpClient.SendAsync(request);
             if (response.Result.IsSuccessStatusCode)
             {
                 string apiResponse = response.Result.Content.ReadAsStringAsync().Result;
                 int[] movement = JsonConvert.DeserializeObject<int[]>(apiResponse);
-                int x1 = movement[0];
-                int y1 = movement[1];
-                int x2 = movement[2];
-                int y2 = movement[3];
+                int y1 = movement[0];
+                int x1 = movement[1];
+                int y2 = movement[2];
+                int x2 = movement[3];
                 GameObject obj = GetPosition(x1, y1);
                 Chessman cm_AI = obj.GetComponent<Chessman>();
                 cm_AI.SetXBoard(x2);
                 cm_AI.SetYBoard(y2);
-                cm_AI.SetCoords();
+                if (y2 == 0)
+                {
+                    cm_AI.name = "black_king_chess";
+                    cm_AI.Activate();
+                } else
+                {
+                    cm_AI.SetCoords();
+                }                
                 SetPosition(obj);
+                SetPositionEmpty(x1, y1);
                 if (Math.Abs(x2 - x1) == 2 && Math.Abs(y2 - y1) == 2)
                 {
                     GameObject obj2 = GetPosition((x1 + x2) / 2, (y1 + y2) / 2);
                     SetPositionEmpty((x1 + x2) / 2, (y1 + y2) / 2);
                     Destroy(obj2);
                     decreaseRed();
+                    CheckEatMore(x2, y2);
                 }
-                SetPositionEmpty(x1, y1);
                 NextTurn();
                 CheckWinner();
             }
@@ -275,6 +297,54 @@ public class Game : MonoBehaviour
         {
             gameOver = false;
             SceneManager.LoadScene("Game");
+        }
+    }
+
+    private void CheckEatMore(int x2, int y2)
+    {
+        if (PositionOnBoard(x2 + 2, y2 + 2) && GetPosition(x2 + 2, y2 + 2) == null)
+        {
+            CheckEatMorePosition(x2, y2, x2 + 2, y2 + 2);
+        }
+        else if (PositionOnBoard(x2 + 2, y2 - 2) && GetPosition(x2 + 2, y2 - 2) == null)
+        {
+            CheckEatMorePosition(x2, y2, x2 + 2, y2 - 2);
+        }
+        else if (PositionOnBoard(x2 - 2, y2 - 2) && GetPosition(x2 - 2, y2 - 2) == null)
+        {
+            CheckEatMorePosition(x2, y2, x2 - 2, y2 - 2);
+        }
+        else if (PositionOnBoard(x2 - 2, y2 + 2) && GetPosition(x2 - 2, y2 + 2) == null)
+        {
+            CheckEatMorePosition(x2, y2, x2 - 2, y2 + 2);
+        }
+    }
+
+    private void CheckEatMorePosition(int x1, int y1, int x2, int y2)
+    {
+        GameObject obj = GetPosition((x1 + x2) / 2, (y1 + y2) / 2);
+        Chessman cm = obj.GetComponent<Chessman>();
+        if (cm.getPlayer() == "red")
+        {
+            GameObject obj2 = GetPosition(x1, y1);
+            Chessman cm_AI = obj2.GetComponent<Chessman>();
+            cm_AI.SetXBoard(x2);
+            cm_AI.SetYBoard(y2);
+            if (y2 == 0)
+            {
+                cm_AI.name = "black_king_chess";
+                cm_AI.Activate();
+            }
+            else
+            {
+                cm_AI.SetCoords();
+            }
+            SetPosition(obj2);
+            SetPositionEmpty(x2, y2);
+            SetPositionEmpty((x1 + x2) / 2, (y1 + y2) / 2);
+            Destroy(obj);
+            decreaseRed();
+            CheckEatMore(x2, y2);
         }
     }
 
