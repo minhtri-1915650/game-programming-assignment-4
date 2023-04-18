@@ -241,10 +241,12 @@ public class Chessman : MonoBehaviour
             SetYBoard(ydis);
             SetCoords();
 
-            GameObject network = controller.GetComponent<Game>().network;
-
-            network.GetComponent<SocketIO>().EmitMove((xdis + GetXBoard()) / 2,
-                (ydis + GetYBoard()) / 2, xdis, ydis, this.player);
+            if (!controller.GetComponent<Game>().PlayVsAI())
+            {
+                GameObject network = controller.GetComponent<Game>().network;
+                network.GetComponent<SocketIO>().EmitMove((xdis + GetXBoard()) / 2,
+                    (ydis + GetYBoard()) / 2, xdis, ydis, this.player);
+            }
 
             // Debug.Log(cm.GetYBoard() + " " + cm.GetPlayer());
 

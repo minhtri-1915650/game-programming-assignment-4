@@ -104,16 +104,18 @@ public class MovePlate : MonoBehaviour
         controller.GetComponent<Game>().SetPosition(reference);
 
         if (color != "red" || cm.RecursionPlay() == 1)
-        {   
+        {
+            cm.DestroyMovePlates();
             if (controller.GetComponent<Game>().PlayVsAI())
             {
-                if (color == "red")
+                if (cm.GetPlayer() == "red")
                 {
                     MovementInfo mv = new MovementInfo(controller.GetComponent<Game>().GetStateBoard());
                     HttpClient _httpClient = new HttpClient();
+                    Debug.Log(JsonConvert.SerializeObject(mv));
                     var request = new HttpRequestMessage
                     {
-                        Method = HttpMethod.Get,
+                        Method = HttpMethod.Put,
                         RequestUri = new Uri("http://localhost:5000/mcts-move"),
                         Content = new StringContent(JsonConvert.SerializeObject(mv), Encoding.UTF8, MediaTypeNames.Application.Json)
                     };
@@ -126,14 +128,19 @@ public class MovePlate : MonoBehaviour
                         int y1 = movement[1];
                         int x2 = movement[2];
                         int y2 = movement[3];
+                        GameObject obj = controller.GetComponent<Game>().GetPosition(x1, y1);
+                        Chessman cm_AI = obj.GetComponent<Chessman>();
+                        cm_AI.SetXBoard(x2);
+                        cm_AI.SetYBoard(y2);
+                        cm_AI.SetCoords();
                         if (Math.Abs(x2 - x1) == 2 && Math.Abs(y2 - y1) == 2)
                         {
-                            controller.GetComponent<Game>().SetPositionEmpty(x1 + 1, y1 + 1);
+                            GameObject obj2 = controller.GetComponent<Game>().GetPosition((x1 + x2) / 2, (y1 + y2) / 2);
+                            controller.GetComponent<Game>().SetPositionEmpty((x1 + x2) / 2, (y1 + y2) / 2);
+                            Destroy(obj2);
+                            controller.GetComponent<Game>().decreaseRed();
                         }
                         controller.GetComponent<Game>().SetPositionEmpty(x1, y1);
-                        cm.SetXBoard(x2);
-                        cm.SetYBoard(y2);
-                        cm.SetCoords();    
                     }
                     else
                     {   
@@ -144,7 +151,6 @@ public class MovePlate : MonoBehaviour
             else
             {
                 controller.GetComponent<Game>().NextTurn();
-                cm.DestroyMovePlates();
                 // controller.GetComponent<Game>().DrawMovingPlate();
             }
         }
