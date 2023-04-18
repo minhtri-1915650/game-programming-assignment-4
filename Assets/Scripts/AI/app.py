@@ -19,9 +19,11 @@ def get_mcts_move():
         num_searches = json['num_searches']
         
         moves = mcts.search(state, player, num_searches)
-        action = max(moves, key=moves.get)
-
-        return jsonify(action)
+        if moves:
+            action = max(moves, key=moves.get)
+            return jsonify(action)
+        else:
+            return jsonify([])
     else:
         print(content_type)
         return {"error": "Content-Type not supported!"}, 415
@@ -36,8 +38,9 @@ def get_random_move():
         player = json['player']
 
         moves = checker.get_valid_moves(state, player)
+        if len(moves) == 0:
+            return jsonify([])
         action = random.choice(moves)
-
         return jsonify(action)
     else:
         print(content_type)

@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using System;
 using System.Net.Http;
 using System.Net.Mime;
+using System.Reflection;
 using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -240,34 +241,41 @@ public class Game : MonoBehaviour
             {
                 string apiResponse = response.Result.Content.ReadAsStringAsync().Result;
                 int[] movement = JsonConvert.DeserializeObject<int[]>(apiResponse);
-                int y1 = movement[0];
-                int x1 = movement[1];
-                int y2 = movement[2];
-                int x2 = movement[3];
-                GameObject obj = GetPosition(x1, y1);
-                Chessman cm_AI = obj.GetComponent<Chessman>();
-                cm_AI.SetXBoard(x2);
-                cm_AI.SetYBoard(y2);
-                if (y2 == 0)
+                if (movement.Length == 0)
                 {
-                    cm_AI.name = "black_king_chess";
-                    cm_AI.Activate();
-                } else
-                {
-                    cm_AI.SetCoords();
-                }                
-                SetPosition(obj);
-                SetPositionEmpty(x1, y1);
-                if (Math.Abs(x2 - x1) == 2 && Math.Abs(y2 - y1) == 2)
-                {
-                    GameObject obj2 = GetPosition((x1 + x2) / 2, (y1 + y2) / 2);
-                    SetPositionEmpty((x1 + x2) / 2, (y1 + y2) / 2);
-                    Destroy(obj2);
-                    decreaseRed();
-                    CheckEatMore(x2, y2);
+                    GameObject.FindGameObjectWithTag("WinnerText").GetComponent<Text>().enabled = true;
+                    GameObject.FindGameObjectWithTag("WinnerText").GetComponent<Text>().text = "AI out of move!!!";
+                    gameOver = true;
                 }
-                NextTurn();
-                CheckWinner();
+                else
+                {
+                    int y1 = movement[0];
+                    int x1 = movement[1];
+                    int y2 = movement[2];
+                    int x2 = movement[3];
+                    GameObject obj = GetPosition(x1, y1);
+                    Chessman cm_AI = obj.GetComponent<Chessman>();
+                    cm_AI.SetXBoard(x2);
+                    cm_AI.SetYBoard(y2);
+                    cm_AI.SetCoords();
+                    if (y2 == 0)
+                    {
+                        cm_AI.name = "black_king_chess";
+                        cm_AI.Activate();
+                    }
+                    SetPosition(obj);
+                    SetPositionEmpty(x1, y1);
+                    if (Math.Abs(x2 - x1) == 2 && Math.Abs(y2 - y1) == 2)
+                    {
+                        GameObject obj2 = GetPosition((x1 + x2) / 2, (y1 + y2) / 2);
+                        SetPositionEmpty((x1 + x2) / 2, (y1 + y2) / 2);
+                        Destroy(obj2);
+                        decreaseRed();
+                        cm_AI.RecursionPlay();
+                    }
+                    NextTurn();
+                    CheckWinner();
+                }                
             }
             else
             {
@@ -296,54 +304,6 @@ public class Game : MonoBehaviour
         {
             gameOver = false;
             SceneManager.LoadScene("Begin");
-        }
-    }
-
-    private void CheckEatMore(int x2, int y2)
-    {
-        if (PositionOnBoard(x2 + 2, y2 + 2) && GetPosition(x2 + 2, y2 + 2) == null)
-        {
-            CheckEatMorePosition(x2, y2, x2 + 2, y2 + 2);
-        }
-        else if (PositionOnBoard(x2 + 2, y2 - 2) && GetPosition(x2 + 2, y2 - 2) == null)
-        {
-            CheckEatMorePosition(x2, y2, x2 + 2, y2 - 2);
-        }
-        else if (PositionOnBoard(x2 - 2, y2 - 2) && GetPosition(x2 - 2, y2 - 2) == null)
-        {
-            CheckEatMorePosition(x2, y2, x2 - 2, y2 - 2);
-        }
-        else if (PositionOnBoard(x2 - 2, y2 + 2) && GetPosition(x2 - 2, y2 + 2) == null)
-        {
-            CheckEatMorePosition(x2, y2, x2 - 2, y2 + 2);
-        }
-    }
-
-    private void CheckEatMorePosition(int x1, int y1, int x2, int y2)
-    {
-        GameObject obj = GetPosition((x1 + x2) / 2, (y1 + y2) / 2);
-        Chessman cm = obj.GetComponent<Chessman>();
-        if (cm.getPlayer() == "red")
-        {
-            GameObject obj2 = GetPosition(x1, y1);
-            Chessman cm_AI = obj2.GetComponent<Chessman>();
-            cm_AI.SetXBoard(x2);
-            cm_AI.SetYBoard(y2);
-            if (y2 == 0)
-            {
-                cm_AI.name = "black_king_chess";
-                cm_AI.Activate();
-            }
-            else
-            {
-                cm_AI.SetCoords();
-            }
-            SetPosition(obj2);
-            SetPositionEmpty(x2, y2);
-            SetPositionEmpty((x1 + x2) / 2, (y1 + y2) / 2);
-            Destroy(obj);
-            decreaseRed();
-            CheckEatMore(x2, y2);
         }
     }
 

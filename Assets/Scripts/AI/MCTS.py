@@ -80,6 +80,8 @@ class MCTS:
         
     def search(self, state, player, num_searches):
         root = Node(self.game, state, player)
+        if len(root.expandable_moves) == 0:
+            return {}
         for _ in range(num_searches):
             node = root
             
