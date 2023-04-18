@@ -95,7 +95,7 @@ public class Chessman : MonoBehaviour
     private void OnMouseUp()
     {
         string playerName = "red";
-        if (!controller.GetComponent<Game>().PlayVsAI())
+        if (!AIMode.aimode)
         {
             GameObject network = controller.GetComponent<Game>().network;
             playerName = network.GetComponent<SocketIO>().name;
@@ -241,7 +241,7 @@ public class Chessman : MonoBehaviour
             SetYBoard(ydis);
             SetCoords();
 
-            if (!controller.GetComponent<Game>().PlayVsAI())
+            if (!AIMode.aimode)
             {
                 GameObject network = controller.GetComponent<Game>().network;
                 network.GetComponent<SocketIO>().EmitMove((xdis + GetXBoard()) / 2,

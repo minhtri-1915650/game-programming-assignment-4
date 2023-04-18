@@ -18,10 +18,12 @@ public class GameManager : MonoBehaviour
     }
 
     public void chooseStateVSMachine() {
+        AIMode.aimode = true;
         changeScence();
     }
 
     public void chooseStateVSPlayer() {
+        AIMode.aimode = false;
         changeScence();
     }
 

@@ -34,12 +34,11 @@ public class Game : MonoBehaviour
 
     private string currentPlayer = "red";
     private bool gameOver = false;
-    private bool playVsAI = true;
     private bool nextTurn = false;
 
     public void Start()
     {
-        if (!playVsAI) this.network = GameObject.FindGameObjectWithTag("Network");
+        if (AIMode.aimode) this.network = GameObject.FindGameObjectWithTag("Network");
         else this.network = null;
 
         playerRed = new GameObject[] {
@@ -77,11 +76,6 @@ public class Game : MonoBehaviour
     public void decreaseRed()
     {
         countRed -= 1;
-    }
-
-    public bool PlayVsAI()
-    {
-        return playVsAI;
     }
 
     public int[,] GetStateBoard()
@@ -234,6 +228,7 @@ public class Game : MonoBehaviour
                 cm_AI.SetXBoard(x2);
                 cm_AI.SetYBoard(y2);
                 cm_AI.SetCoords();
+                SetPosition(obj);
                 if (Math.Abs(x2 - x1) == 2 && Math.Abs(y2 - y1) == 2)
                 {
                     GameObject obj2 = GetPosition((x1 + x2) / 2, (y1 + y2) / 2);
@@ -262,7 +257,7 @@ public class Game : MonoBehaviour
             {
                 currentPlayer = "red";
             }
-            if (!playVsAI)
+            if (!AIMode.aimode)
             {
                 network.GetComponent<SocketIO>().NextTurn(currentPlayer);
             }
