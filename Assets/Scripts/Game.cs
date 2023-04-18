@@ -35,7 +35,7 @@ public class Game : MonoBehaviour
     private string currentPlayer = "red";
     private bool gameOver = false;
     private bool playVsAI = true;
-    private bool AITurn = false;
+    private bool nextTurn = false;
 
     public void Start()
     {
@@ -172,22 +172,7 @@ public class Game : MonoBehaviour
 
     public void NextTurn()
     {
-        if (currentPlayer == "red")
-        {
-            currentPlayer = "black";
-        }
-        else
-        {
-            currentPlayer = "red";
-        }
-        if (playVsAI)
-        {
-            AITurn = (currentPlayer == "black");
-        }
-        else
-        {
-            network.GetComponent<SocketIO>().NextTurn(currentPlayer);
-        }
+        nextTurn = true;
     }
 
     public void DrawMovingPlate()
@@ -225,7 +210,7 @@ public class Game : MonoBehaviour
 
     public void Update()
     {
-        if (AITurn)
+        if (currentPlayer == "black")
         {
             MovementInfo mv = new MovementInfo(GetStateBoard());
             HttpClient _httpClient = new HttpClient();
@@ -262,9 +247,26 @@ public class Game : MonoBehaviour
             }
             else
             {
+                Debug.Log(mv.state.ToString());
                 Debug.Log("Error when calling API: " + response.Result.StatusCode);
                 Debug.Log("Try to calling...");
             }
+        }
+        if (nextTurn)
+        {
+            if (currentPlayer == "red")
+            {
+                currentPlayer = "black";
+            }
+            else
+            {
+                currentPlayer = "red";
+            }
+            if (!playVsAI)
+            {
+                network.GetComponent<SocketIO>().NextTurn(currentPlayer);
+            }
+            nextTurn = false;
         }
         if (gameOver == true && Input.GetMouseButtonDown(0))
         {
