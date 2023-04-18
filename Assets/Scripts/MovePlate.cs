@@ -1,25 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using System;
-using System.Net.Http;
-using System.Text;
-using Newtonsoft.Json;
-using System.Net.Mime;
-
-public class MovementInfo
-{
-    public int[,] state = new int[8, 8];
-    public int player;
-    public int num_searches;
-    
-    public MovementInfo(int[,] stateBoard)
-    {
-        state = stateBoard;
-        player = -1;
-        num_searches = 100;
-    }
-}
 
 public class MovePlate : MonoBehaviour
 {
@@ -106,53 +85,8 @@ public class MovePlate : MonoBehaviour
         if (color != "red" || cm.RecursionPlay() == 1)
         {
             cm.DestroyMovePlates();
-            if (controller.GetComponent<Game>().PlayVsAI())
-            {
-                if (cm.GetPlayer() == "red")
-                {
-                    MovementInfo mv = new MovementInfo(controller.GetComponent<Game>().GetStateBoard());
-                    HttpClient _httpClient = new HttpClient();
-                    Debug.Log(JsonConvert.SerializeObject(mv));
-                    var request = new HttpRequestMessage
-                    {
-                        Method = HttpMethod.Put,
-                        RequestUri = new Uri("http://localhost:5000/mcts-move"),
-                        Content = new StringContent(JsonConvert.SerializeObject(mv), Encoding.UTF8, MediaTypeNames.Application.Json)
-                    };
-                    var response = _httpClient.SendAsync(request);
-                    if (response.Result.IsSuccessStatusCode)
-                    {
-                        string apiResponse = response.Result.Content.ReadAsStringAsync().Result;
-                        int[] movement = JsonConvert.DeserializeObject<int[]>(apiResponse);
-                        int x1 = movement[0];
-                        int y1 = movement[1];
-                        int x2 = movement[2];
-                        int y2 = movement[3];
-                        GameObject obj = controller.GetComponent<Game>().GetPosition(x1, y1);
-                        Chessman cm_AI = obj.GetComponent<Chessman>();
-                        cm_AI.SetXBoard(x2);
-                        cm_AI.SetYBoard(y2);
-                        cm_AI.SetCoords();
-                        if (Math.Abs(x2 - x1) == 2 && Math.Abs(y2 - y1) == 2)
-                        {
-                            GameObject obj2 = controller.GetComponent<Game>().GetPosition((x1 + x2) / 2, (y1 + y2) / 2);
-                            controller.GetComponent<Game>().SetPositionEmpty((x1 + x2) / 2, (y1 + y2) / 2);
-                            Destroy(obj2);
-                            controller.GetComponent<Game>().decreaseRed();
-                        }
-                        controller.GetComponent<Game>().SetPositionEmpty(x1, y1);
-                    }
-                    else
-                    {   
-                        Console.WriteLine(response.Result.StatusCode);
-                    }                    
-                }
-            }
-            else
-            {
-                controller.GetComponent<Game>().NextTurn();
-                // controller.GetComponent<Game>().DrawMovingPlate();
-            }
+            controller.GetComponent<Game>().NextTurn();
+            // controller.GetComponent<Game>().DrawMovingPlate();
         }
         controller.GetComponent<Game>().CheckWinner();
     }

@@ -1,9 +1,25 @@
-using System.Collections;
-using System.Collections.Generic;
+using Newtonsoft.Json;
+using System;
+using System.Net.Http;
+using System.Net.Mime;
+using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+public class MovementInfo
+{
+    public int[,] state = new int[8, 8];
+    public int player;
+    public int num_searches;
+
+    public MovementInfo(int[,] stateBoard)
+    {
+        state = stateBoard;
+        player = -1;
+        num_searches = 100;
+    }
+}
 
 public class Game : MonoBehaviour
 {
@@ -19,6 +35,7 @@ public class Game : MonoBehaviour
     private string currentPlayer = "red";
     private bool gameOver = false;
     private bool playVsAI = true;
+    private bool AITurn = false;
 
     public void Start()
     {
@@ -163,8 +180,14 @@ public class Game : MonoBehaviour
         {
             currentPlayer = "red";
         }
-
-        network.GetComponent<SocketIO>().NextTurn(currentPlayer);
+        if (playVsAI)
+        {
+            AITurn = (currentPlayer == "black");
+        }
+        else
+        {
+            network.GetComponent<SocketIO>().NextTurn(currentPlayer);
+        }
     }
 
     public void DrawMovingPlate()
@@ -202,6 +225,47 @@ public class Game : MonoBehaviour
 
     public void Update()
     {
+        if (AITurn)
+        {
+            MovementInfo mv = new MovementInfo(GetStateBoard());
+            HttpClient _httpClient = new HttpClient();
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Put,
+                RequestUri = new Uri("http://localhost:5000/mcts-move"),
+                Content = new StringContent(JsonConvert.SerializeObject(mv), Encoding.UTF8, MediaTypeNames.Application.Json)
+            };
+            var response = _httpClient.SendAsync(request);
+            if (response.Result.IsSuccessStatusCode)
+            {
+                string apiResponse = response.Result.Content.ReadAsStringAsync().Result;
+                int[] movement = JsonConvert.DeserializeObject<int[]>(apiResponse);
+                int x1 = movement[0];
+                int y1 = movement[1];
+                int x2 = movement[2];
+                int y2 = movement[3];
+                GameObject obj = GetPosition(x1, y1);
+                Chessman cm_AI = obj.GetComponent<Chessman>();
+                cm_AI.SetXBoard(x2);
+                cm_AI.SetYBoard(y2);
+                cm_AI.SetCoords();
+                if (Math.Abs(x2 - x1) == 2 && Math.Abs(y2 - y1) == 2)
+                {
+                    GameObject obj2 = GetPosition((x1 + x2) / 2, (y1 + y2) / 2);
+                    SetPositionEmpty((x1 + x2) / 2, (y1 + y2) / 2);
+                    Destroy(obj2);
+                    decreaseRed();
+                }
+                SetPositionEmpty(x1, y1);
+                NextTurn();
+                CheckWinner();
+            }
+            else
+            {
+                Debug.Log("Error when calling API: " + response.Result.StatusCode);
+                Debug.Log("Try to calling...");
+            }
+        }
         if (gameOver == true && Input.GetMouseButtonDown(0))
         {
             gameOver = false;
