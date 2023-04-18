@@ -26,6 +26,8 @@ public class Game : MonoBehaviour
     public GameObject chesspiece;
     public GameObject network;
 
+    public GameObject button;
+
     private GameObject[,] positions = new GameObject[8, 8];
     private GameObject[] playerBlack = new GameObject[12];
     private GameObject[] playerRed = new GameObject[12];
@@ -39,7 +41,11 @@ public class Game : MonoBehaviour
     public void Start()
     {
         if (AIMode.aimode) this.network = GameObject.FindGameObjectWithTag("Network");
-        else this.network = null;
+        else
+        {
+            button.SetActive(false);
+            this.network = null;
+        }
 
         playerRed = new GameObject[] {
             Create("red_chess", 0, 0), Create("red_chess", 2, 0), Create("red_chess", 4, 0), Create("red_chess", 6, 0),
@@ -81,8 +87,10 @@ public class Game : MonoBehaviour
     public int[,] GetStateBoard()
     {
         int[,] state = new int[8, 8];
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
                 if (positions[i, j] == null)
                 {
                     state[i, j] = 0;
