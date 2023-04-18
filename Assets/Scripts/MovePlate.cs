@@ -1,6 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+using System.Net.Http;
+using System.Text;
+using Newtonsoft.Json;
+using System.Net.Mime;
+
+public class MovementInfo
+{
+    public int[,] state = new int[8, 8];
+    public int player;
+    public int num_searches;
+    
+    public MovementInfo(int[,] stateBoard)
+    {
+        state = stateBoard;
+        player = -1;
+        num_searches = 100;
+    }
+}
 
 public class MovePlate : MonoBehaviour
 {
@@ -56,10 +75,12 @@ public class MovePlate : MonoBehaviour
             else controller.GetComponent<Game>().decreaseRed();
         }
 
-        GameObject network = controller.GetComponent<Game>().network;
+        if (!controller.GetComponent<Game>().PlayVsAI()) {
+            GameObject network = controller.GetComponent<Game>().network;
 
-        network.GetComponent<SocketIO>().EmitMove(cm.GetXBoard(), cm.GetYBoard(), matrixX, matrixY, cm.getPlayer());
-
+            network.GetComponent<SocketIO>().EmitMove(cm.GetXBoard(), cm.GetYBoard(), matrixX, matrixY, cm.getPlayer());
+        }
+        
         controller.GetComponent<Game>().SetPositionEmpty(
             cm.GetXBoard(),
             cm.GetYBoard());
@@ -83,10 +104,49 @@ public class MovePlate : MonoBehaviour
         controller.GetComponent<Game>().SetPosition(reference);
 
         if (color != "red" || cm.RecursionPlay() == 1)
-        {
-            controller.GetComponent<Game>().NextTurn();
-            cm.DestroyMovePlates();
-            // controller.GetComponent<Game>().DrawMovingPlate();
+        {   
+            if (controller.GetComponent<Game>().PlayVsAI())
+            {
+                if (color == "red")
+                {
+                    MovementInfo mv = new MovementInfo(controller.GetComponent<Game>().GetStateBoard());
+                    HttpClient _httpClient = new HttpClient();
+                    var request = new HttpRequestMessage
+                    {
+                        Method = HttpMethod.Get,
+                        RequestUri = new Uri("http://localhost:5000/mcts-move"),
+                        Content = new StringContent(JsonConvert.SerializeObject(mv), Encoding.UTF8, MediaTypeNames.Application.Json)
+                    };
+                    var response = _httpClient.SendAsync(request);
+                    if (response.Result.IsSuccessStatusCode)
+                    {
+                        string apiResponse = response.Result.Content.ReadAsStringAsync().Result;
+                        int[] movement = JsonConvert.DeserializeObject<int[]>(apiResponse);
+                        int x1 = movement[0];
+                        int y1 = movement[1];
+                        int x2 = movement[2];
+                        int y2 = movement[3];
+                        if (Math.Abs(x2 - x1) == 2 && Math.Abs(y2 - y1) == 2)
+                        {
+                            controller.GetComponent<Game>().SetPositionEmpty(x1 + 1, y1 + 1);
+                        }
+                        controller.GetComponent<Game>().SetPositionEmpty(x1, y1);
+                        cm.SetXBoard(x2);
+                        cm.SetYBoard(y2);
+                        cm.SetCoords();    
+                    }
+                    else
+                    {   
+                        Console.WriteLine(response.Result.StatusCode);
+                    }                    
+                }
+            }
+            else
+            {
+                controller.GetComponent<Game>().NextTurn();
+                cm.DestroyMovePlates();
+                // controller.GetComponent<Game>().DrawMovingPlate();
+            }
         }
         controller.GetComponent<Game>().CheckWinner();
     }

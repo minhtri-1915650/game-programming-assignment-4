@@ -18,10 +18,12 @@ public class Game : MonoBehaviour
 
     private string currentPlayer = "red";
     private bool gameOver = false;
+    private bool playVsAI = true;
 
     public void Start()
     {
-        this.network = GameObject.FindGameObjectWithTag("Network");
+        if (!playVsAI) this.network = GameObject.FindGameObjectWithTag("Network");
+        else this.network = null;
 
         playerRed = new GameObject[] {
             Create("red_chess", 0, 0), Create("red_chess", 2, 0), Create("red_chess", 4, 0), Create("red_chess", 6, 0),
@@ -60,7 +62,43 @@ public class Game : MonoBehaviour
         countRed -= 1;
     }
 
+    public bool PlayVsAI()
+    {
+        return playVsAI;
+    }
 
+    public int[,] GetStateBoard()
+    {
+        int[,] state = new int[8, 8];
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (positions[i, j] == null)
+                {
+                    state[i, j] = 0;
+                }
+                else
+                {
+                    GameObject obj = positions[i, j];
+                    switch (obj.name)
+                    {
+                        case "black_chess":
+                            state[i, j] = -1;
+                            break;
+                        case "black_king_chess":
+                            state[i, j] = -2;
+                            break;
+                        case "red_chess":
+                            state[i, j] = 1;
+                            break;
+                        case "red_king_chess":
+                            state[i, j] = 2;
+                            break;
+                    }
+                }
+            }
+        }
+        return state;
+    }
 
     public GameObject Create(string name, int x, int y)
     {

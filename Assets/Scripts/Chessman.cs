@@ -94,9 +94,12 @@ public class Chessman : MonoBehaviour
 
     private void OnMouseUp()
     {
-        GameObject network = controller.GetComponent<Game>().network;
-
-        string playerName = network.GetComponent<SocketIO>().name;
+        string playerName = "red";
+        if (!controller.GetComponent<Game>().PlayVsAI())
+        {
+            GameObject network = controller.GetComponent<Game>().network;
+            playerName = network.GetComponent<SocketIO>().name;
+        }
 
         if (!controller.GetComponent<Game>().IsGameOver() && controller.GetComponent<Game>().GetCurrentPlayer() == player && controller.GetComponent<Game>().GetCurrentPlayer() == playerName)
         {
