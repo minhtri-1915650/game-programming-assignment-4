@@ -40,11 +40,10 @@ public class Game : MonoBehaviour
 
     public void Start()
     {
-        if (AIMode.aimode) this.network = GameObject.FindGameObjectWithTag("Network");
-        else
+        if (!AIMode.aimode)
         {
             button.SetActive(false);
-            this.network = null;
+            this.network = GameObject.FindGameObjectWithTag("Network");
         }
 
         playerRed = new GameObject[] {
@@ -296,7 +295,7 @@ public class Game : MonoBehaviour
         if (gameOver == true && Input.GetMouseButtonDown(0))
         {
             gameOver = false;
-            SceneManager.LoadScene("Game");
+            SceneManager.LoadScene("Begin");
         }
     }
 

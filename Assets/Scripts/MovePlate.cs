@@ -57,7 +57,7 @@ public class MovePlate : MonoBehaviour
         if (!AIMode.aimode) {
             GameObject network = controller.GetComponent<Game>().network;
 
-            network.GetComponent<SocketIO>().EmitMove(cm.GetXBoard(), cm.GetYBoard(), matrixX, matrixY, cm.getPlayer());
+            network.GetComponent<SocketIO>().EmitMove(cm.GetXBoard(), cm.GetYBoard(), matrixX, matrixY, cm.getPlayer(), color);
         }
         
         controller.GetComponent<Game>().SetPositionEmpty(

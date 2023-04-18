@@ -245,7 +245,7 @@ public class Chessman : MonoBehaviour
             {
                 GameObject network = controller.GetComponent<Game>().network;
                 network.GetComponent<SocketIO>().EmitMove((xdis + GetXBoard()) / 2,
-                    (ydis + GetYBoard()) / 2, xdis, ydis, this.player);
+                    (ydis + GetYBoard()) / 2, xdis, ydis, this.player, "red");
             }
 
             // Debug.Log(cm.GetYBoard() + " " + cm.GetPlayer());
@@ -263,6 +263,7 @@ public class Chessman : MonoBehaviour
             controller.GetComponent<Game>().SetPosition(gameObject);
             // StartCoroutine(WaitFor(1));
             // Debug.Log("Start");
+            DestroyMovePlates();
             return RecursionPlay();
         }
         return 1;

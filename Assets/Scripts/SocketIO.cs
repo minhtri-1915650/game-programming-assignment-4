@@ -70,9 +70,9 @@ public class SocketIO : MonoBehaviour
         socket.Emit("next-turn", player);
     }
 
-    public void EmitMove(int x, int y, int endX, int endY, string currentPlayer)
+    public void EmitMove(int x, int y, int endX, int endY, string currentPlayer, string color)
     {
-        PositionOnBoard p = new PositionOnBoard(x, y, endX, endY, currentPlayer);
+        PositionOnBoard p = new PositionOnBoard(x, y, endX, endY, currentPlayer, color);
         socket.Emit("move", p);
     }
 
@@ -123,6 +123,21 @@ public class SocketIO : MonoBehaviour
                 cm.SetYBoard(data.endY);
                 cm.SetCoords();
 
+                if (Math.Abs(data.endX - data.x) == 2 && Math.Abs(data.endY - data.y) == 2)
+                {
+                    GameObject mid = controller.GetComponent<Game>().GetPosition(
+                        (data.endX + data.x) / 2,
+                        (data.endY + data.y) / 2
+                    );
+                    controller.GetComponent<Game>().SetPositionEmpty(
+                        (data.endX + data.x) / 2,
+                        (data.endY + data.y) / 2
+                    );
+                    Destroy(mid);
+                    if (cm.getPlayer() == "red") controller.GetComponent<Game>().decreaseBlack();
+                    else controller.GetComponent<Game>().decreaseRed();
+                }
+
                 if (cm.GetYBoard() == 7 && cm.GetPlayer() == "red")
                 {
                     cm.name = "red_king_chess";
@@ -135,6 +150,8 @@ public class SocketIO : MonoBehaviour
                 }
 
                 controller.SetPosition(cp);
+                if (data.color == "red") cm.RecursionPlay();
+                controller.GetComponent<Game>().CheckWinner();
             }
 
         });
@@ -147,14 +164,16 @@ public class SocketIO : MonoBehaviour
         public int y, endY;
 
         public string currentPlayer;
+        public string color;
 
-        public PositionOnBoard(int x, int y, int endX, int endY, string currentPlayer)
+        public PositionOnBoard(int x, int y, int endX, int endY, string currentPlayer, string color)
         {
             this.x = x;
             this.y = y;
             this.endX = endX;
             this.endY = endY;
             this.currentPlayer = currentPlayer;
+            this.color = color;
         }
     }
 }
